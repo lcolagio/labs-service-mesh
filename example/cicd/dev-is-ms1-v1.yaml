@@ -2,7 +2,7 @@ kind: ImageStream
 apiVersion: image.openshift.io/v1
 metadata:
   name: tasks-ms1-v1
-#  namespace: luigi3-dev
+  namespace: luigi3-dev
   labels:
     build: tasks-ms1-v1
 spec:
