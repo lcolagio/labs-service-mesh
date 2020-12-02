@@ -1,0 +1,113 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: tasks-ms1-v1-pipeline
+  namespace: luigi3-cicd
+  labels:
+    app: cicd-pipeline
+    group: cicd
+    name: cicd-pipeline
+    template: cicd
+spec:
+  nodeSelector: {}
+  output: {}
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: JenkinsPipeline
+    jenkinsPipelineStrategy:
+      jenkinsfile: |-
+        def mvnCmd = "mvn -s configuration/cicd-settings-nexus3.xml"
+        pipeline {
+          agent {
+            label 'maven'
+          }
+          stages {
+            stage('Build App') {
+              steps {
+                git branch: 'eap-7', url: 'http://gogs:3000/gogs/openshift-tasks.git'
+                sh "${mvnCmd} install -DskipTests=true"
+              }
+            }
+            stage('Archive App') {
+              steps {
+                sh "${mvnCmd} deploy -DskipTests=true -P nexus3"
+              }
+            }
+            stage('Build Image') {
+              steps {
+                sh "cp target/openshift-tasks.war target/ROOT.war"
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(env.DEV_PROJECT) {
+                      openshift.selector("bc", "tasks-ms1-v1").startBuild("--from-file=target/ROOT.war", "--wait=true")
+                    }
+                  }
+                }
+              }
+            }
+            stage('Deploy DEV') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(env.DEV_PROJECT) {
+                      openshift.selector("dc", "tasks-ms1-v1").rollout().latest();
+                    }
+                  }
+                }
+              }
+            }
+            stage('Promote to STAGE?') {
+              agent {
+                label 'skopeo'
+              }
+              steps {
+                script {
+                  openshift.withCluster() {
+                    if (env.ENABLE_QUAY.toBoolean()) {
+                      withCredentials([usernamePassword(credentialsId: "${openshift.project()}-quay-cicd-secret", usernameVariable: "QUAY_USER", passwordVariable: "QUAY_PWD")]) {
+                        sh "skopeo copy docker://quay.io//tasks-app:latest docker://quay.io//tasks-app:stage --src-creds \"$QUAY_USER:$QUAY_PWD\" --dest-creds \"$QUAY_USER:$QUAY_PWD\" --src-tls-verify=false --dest-tls-verify=false"
+                      }
+                    } else {
+                      openshift.tag("${env.DEV_PROJECT}/tasks-ms1-v1:latest, "${env.STAGE_PROJECT}/tasks-ms1-v1:stage")
+                    }
+                  }
+                }
+              }
+            }
+            stage('Deploy STAGE') {
+              steps {
+                script {
+                  openshift.withCluster() {
+                    openshift.withProject(env.STAGE_PROJECT) {
+                      openshift.selector("dc", "tasks-ms1-v1").rollout().latest();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      env:
+        - name: DEV_PROJECT
+          value: luigi3-dev
+        - name: STAGE_PROJECT
+          value: luigi3-stage
+        - name: ENABLE_QUAY
+          value: 'false'
+        - name: MICROSERVCICE_NAME
+          value: ms1
+        - name: MICROSERVCICE_VERSION
+          value: v1        
+  postCommit: {}
+  source:
+    type: None
+  triggers:
+    - type: GitHub
+      github:
+        secret: jO5SQt6F
+    - type: Generic
+      generic:
+        secret: jO5SQt6F
+  runPolicy: Serial
