@@ -19,6 +19,7 @@ spec:
     jenkinsPipelineStrategy:
       jenkinsfile: |-
         def mvnCmd = "mvn -s configuration/cicd-settings-nexus3.xml"
+
         pipeline {
           agent {
             label 'maven'
@@ -67,10 +68,10 @@ spec:
                   openshift.withCluster() {
                     if (env.ENABLE_QUAY.toBoolean()) {
                       withCredentials([usernamePassword(credentialsId: "${openshift.project()}-quay-cicd-secret", usernameVariable: "QUAY_USER", passwordVariable: "QUAY_PWD")]) {
-                        sh "skopeo copy docker://quay.io//tasks-app:latest docker://quay.io//tasks-app:stage --src-creds \"$QUAY_USER:$QUAY_PWD\" --dest-creds \"$QUAY_USER:$QUAY_PWD\" --src-tls-verify=false --dest-tls-verify=false"
+                        sh "skopeo copy docker://quay.io//tasks-ms1-v1-app:latest docker://quay.io//tasks-ms1-v1-app:stage --src-creds \"$QUAY_USER:$QUAY_PWD\" --dest-creds \"$QUAY_USER:$QUAY_PWD\" --src-tls-verify=false --dest-tls-verify=false"
                       }
                     } else {
-                      openshift.tag("${env.DEV_PROJECT}/tasks-ms1-v1:latest, "${env.STAGE_PROJECT}/tasks-ms1-v1:stage")
+                      openshift.tag("${env.DEV_PROJECT}/tasks-ms1-v1:latest", "${env.STAGE_PROJECT}/tasks-ms1-v1:stage")
                     }
                   }
                 }
@@ -96,18 +97,14 @@ spec:
           value: luigi3-stage
         - name: ENABLE_QUAY
           value: 'false'
-        - name: MICROSERVCICE_NAME
-          value: ms1
-        - name: MICROSERVCICE_VERSION
-          value: v1        
   postCommit: {}
   source:
     type: None
   triggers:
     - type: GitHub
       github:
-        secret: jO5SQt6F
+        secret: HdAcNnHF
     - type: Generic
       generic:
-        secret: jO5SQt6F
+        secret: HdAcNnHF
   runPolicy: Serial
