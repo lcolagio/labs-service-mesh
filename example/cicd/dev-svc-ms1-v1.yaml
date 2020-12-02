@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: tasks-ms1-v1
+  namespace: luigi2-dev
+  labels:
+    app: tasks-ms1-v1
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    deploymentconfig: tasks-ms1-v1
+
+  type: ClusterIP
+  sessionAffinity: None
