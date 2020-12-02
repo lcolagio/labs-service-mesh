@@ -2,7 +2,7 @@ kind: DeploymentConfig
 apiVersion: apps.openshift.io/v1
 metadata:
   name: tasks-ms1-v1
-  namespace: luigi2-dev
+  namespace: luigi3-dev
   labels:
     app: tasks-ms1-v1
 spec:
@@ -24,7 +24,7 @@ spec:
           - tasks-ms1-v1
         from:
           kind: ImageStreamTag
-          namespace: luigi2-dev
+          namespace: luigi3-dev
           name: 'tasks-ms1-v1:latest'
   replicas: 1
   revisionHistoryLimit: 10
