@@ -1,0 +1,25 @@
+env:
+  global:
+  - IMAGE_REPO=quay.io/siamaksade/tasks-sample-app
+
+cache:
+  directories:
+  - $HOME/.m2
+
+services:
+  - docker
+
+language: java
+
+jdk:
+  - oraclejdk8
+
+before_install:
+  - docker login -u $QUAY_USER -p $QUAY_PASS quay.io
+  - curl -sL -o $HOME/s2i.tar.gz https://github.com/openshift/source-to-image/releases/download/v1.1.10/source-to-image-v1.1.10-27f0729d-linux-amd64.tar.gz
+  - pushd $HOME/bin && tar xvfz $HOME/s2i.tar.gz && popd
+
+script:
+  - mvn package
+  - ${HOME}/bin/s2i build . openshift/wildfly-120-centos7 $IMAGE_REPO:$TRAVIS_BRANCH-release
+  - docker push $IMAGE_REPO:$TRAVIS_BRANCH-release
