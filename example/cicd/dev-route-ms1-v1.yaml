@@ -1,0 +1,15 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: tasks-ms1-v1
+  namespace: luigi2-dev
+  labels:
+    app: tasks-ms1-v1
+spec:
+  to:
+    kind: Service
+    name: tasks-ms1-v1
+    weight: 100
+  port:
+    targetPort: 8080
+  wildcardPolicy: None
