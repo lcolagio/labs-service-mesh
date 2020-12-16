@@ -157,8 +157,6 @@ spec:
         version: v1
       annotations:
         sidecar.istio.io/inject: "true"
-#        sidecar.istio.io/proxyCPU: "500m"
-#        sidecar.istio.io/proxyMemory: 400Mi
     spec:
       containers:
       - env:
@@ -192,8 +190,6 @@ spec:
         version: v2
       annotations:
         sidecar.istio.io/inject: "true"
-#        sidecar.istio.io/proxyCPU: "500m"
-#        sidecar.istio.io/proxyMemory: 400Mi
     spec:
       containers:
       - env:
@@ -227,8 +223,6 @@ spec:
         version: v3
       annotations:
         sidecar.istio.io/inject: "true"
-#        sidecar.istio.io/proxyCPU: "500m"
-#        sidecar.istio.io/proxyMemory: 400Mi
     spec:
       containers:
       - env:
