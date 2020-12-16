@@ -2,7 +2,7 @@
 # Add Control Plane
 ######################
 
-oc new-project ${MY_SM_SMCP}
+oc project ${MY_SM_SMCP}
 
 oc apply -f -<<EOF
 
