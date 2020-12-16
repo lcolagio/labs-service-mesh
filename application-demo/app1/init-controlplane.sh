@@ -2,9 +2,6 @@
 # Add Control Plane
 ######################
 
-export MY_SM_SMCP=mgen-servicemesh-cp
-export SUBDOMAIN=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}')
-
 oc new-project ${MY_SM_SMCP}
 
 oc apply -f -<<EOF
