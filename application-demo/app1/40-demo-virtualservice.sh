@@ -2,6 +2,8 @@
 # VS 
 ############################
 
+delete virtualservice customer
+
 oc apply -f -<<EOF
 
 kind: VirtualService
