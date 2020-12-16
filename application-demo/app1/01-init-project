@@ -1,0 +1,2 @@
+oc new-project ${MY_SM_SMCP}
+oc new-project ${MY_SM_APP}
