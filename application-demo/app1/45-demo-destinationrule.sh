@@ -2,7 +2,7 @@
 # VS 
 ############################
 
-delete virtualservice customer
+oc delete virtualservice customer
 
 oc apply -f -<<EOF
 
