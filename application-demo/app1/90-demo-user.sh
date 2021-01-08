@@ -1,6 +1,6 @@
 
 export MY_SM_SMCP=mgen-servicemesh-cp
-export MY_SM_APP=mgen-servicemesh-app-1
+export MY_SM_APP=mgen-servicemesh-app1
 export SUBDOMAIN=$(oc get ingresses.config.openshift.io cluster -o jsonpath='{.spec.domain}')
 export MY_SM_APP_ROUTE=$(oc get route ${MY_SM_APP} -n ${MY_SM_SMCP} -o 'jsonpath={.spec.host}')
 
